@@ -16,8 +16,7 @@ public:
     }
 
     bool verifyPin(int enteredPin) {
-        // DEBUG LINE - remove later
-        cout << "DEBUG: System PIN is = " << pin << endl;
+    
         return enteredPin == pin;
     }
 
@@ -60,59 +59,99 @@ public:
             }
         }
     }
+
+    void changePin(int oldPin, int newPin) {
+        if (oldPin == pin) {
+            pin = newPin;
+            cout << "PIN changed successfully." << endl;
+            history.push_back("PIN changed");
+        } else {
+            cout << "Incorrect old PIN. PIN not changed." << endl;
+        }
+    }
 };
 
+
 int main() {
-    // CHANGE PIN HERE
     ATM user(2387, 5000);   // PIN = 2387, Balance = 5000
 
     int enteredPin;
-    cout << "===== Welcome to ATM =====" << endl;
-    cout << "Enter your PIN: ";
-    cin >> enteredPin;
+    int attempts = 0;
 
-    if (!user.verifyPin(enteredPin)) {
-        cout << "Incorrect PIN. Access denied!" << endl;
+    // 3-attempt PIN logic
+    while (attempts < 3) {
+        cout << "Enter your PIN: ";
+        cin >> enteredPin;
+
+        if (user.verifyPin(enteredPin)) {
+            break;   // correct PIN
+        } else {
+            attempts++;
+            cout << "Wrong PIN! Attempts left: " << 3 - attempts << endl;
+        }
+    }
+
+    if (attempts == 3) {
+        cout << "Account locked. Too many wrong attempts." << endl;
         return 0;
     }
 
+    // DIRECTLY go to menu – DO NOT ask PIN again
     int choice;
     double amount;
 
     do {
-        cout << "\n===== ATM MENU =====" << endl;
-        cout << "1. Check Balance" << endl;
-        cout << "2. Deposit Money" << endl;
-        cout << "3. Withdraw Money" << endl;
-        cout << "4. Transaction History" << endl;
-        cout << "5. Exit" << endl;
-        cout << "Enter your choice: ";
-        cin >> choice;
+    cout << "\n===== ATM MENU =====" << endl;
+    cout << "1. Check Balance" << endl;
+    cout << "2. Deposit Money" << endl;
+    cout << "3. Withdraw Money" << endl;
+    cout << "4. Transaction History" << endl;
+    cout << "5. Exit" << endl;
+    cout << "6. Change PIN" << endl;
+    cout << "Enter your choice: ";
+    cin >> choice;
 
-        switch (choice) {
-            case 1:
-                user.checkBalance();
-                break;
-            case 2:
-                cout << "Enter amount to deposit: ";
-                cin >> amount;
-                user.deposit(amount);
-                break;
-            case 3:
-                cout << "Enter amount to withdraw: ";
-                cin >> amount;
-                user.withdraw(amount);
-                break;
-            case 4:
-                user.showHistory();
-                break;
-            case 5:
-                cout << "Thank you for using ATM!" << endl;
-                break;
-            default:
-                cout << "Invalid choice. Try again." << endl;
+    switch (choice) {
+        case 1:
+            user.checkBalance();
+            break;
+
+        case 2:
+            cout << "Enter amount to deposit: ";
+            cin >> amount;
+            user.deposit(amount);
+            break;
+
+        case 3:
+            cout << "Enter amount to withdraw: ";
+            cin >> amount;
+            user.withdraw(amount);
+            break;
+
+        case 4:
+            user.showHistory();
+            break;
+
+        case 5:
+            cout << "Thank you for using ATM!" << endl;
+            break;
+
+        case 6: {
+            int oldPin, newPin;
+            cout << "Enter old PIN: ";
+            cin >> oldPin;
+
+            cout << "Enter new PIN: ";
+            cin >> newPin;
+
+            user.changePin(oldPin, newPin);
+            break;
         }
-    } while (choice != 5);
 
-    return 0;
+        default:
+            cout << "Invalid choice. Try again." << endl;
+    }
+
+} while (choice != 5);
+return 0;
 }
